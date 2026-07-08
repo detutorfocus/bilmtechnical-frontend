@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Bilm Technical Services</title>
+    <!-- Tailwind CDN — no install needed -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              head: ["Cambria","Georgia","serif"],
+              body: ["Arial","Calibri","sans-serif"],
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+      body{background:#060e1c;font-family:Arial,Calibri,sans-serif;-webkit-font-smoothing:antialiased;}
+      input,select,textarea{color-scheme:dark;outline:none;}
+      input::placeholder,textarea::placeholder{color:rgba(90,122,154,0.5);}
+      ::-webkit-scrollbar{width:5px;height:5px;}
+      ::-webkit-scrollbar-track{background:#060e1c;}
+      ::-webkit-scrollbar-thumb{background:rgba(34,197,94,0.3);border-radius:3px;}
+      @keyframes spin{to{transform:rotate(360deg)}}
+      @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+      @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+      .spin{animation:spin .8s linear infinite;}
+      .pulse{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite;}
+      .fade-up{animation:fadeUp .5s ease forwards;}
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
