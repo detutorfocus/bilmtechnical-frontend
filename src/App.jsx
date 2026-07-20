@@ -598,12 +598,12 @@ function AboutSection() {
 
 // ─── Services ─────────────────────────────────────────────────────────────────
 const services = [
-  { title: "Generator Rental", desc: "Wide range of generators from 20KVA to 2000KVA for all industrial needs. Diesel engine driven with full maintenance support.", icon: <Icon.Bolt />, badge: "Most Popular" },
-  { title: "Forklift Rental", desc: "Reliable forklift solutions for material handling, loading and unloading operations at industrial sites.", icon: <Icon.Truck /> },
-  { title: "Construction Equipment", desc: "Excavators, wheel loaders, breakers and more for your heavy-duty construction and industrial projects.", icon: <Icon.HardHat /> },
-  { title: "Equipment Maintenance", desc: "Preventive and corrective maintenance by certified technicians to keep your equipment running at peak performance.", icon: <Icon.Wrench /> },
-  { title: "Spare Parts Supply", desc: "Genuine Caterpillar and Perkins engine spare parts for generators, forklifts and heavy equipment.", icon: <Icon.Package /> },
-  { title: "Industrial Technical Services", desc: "Expert technical support, installation, troubleshooting and project-based industrial services.", icon: <Icon.Gear /> },
+  { title: "Generator Rental", desc: "Wide range of generators from 20KVA to 2000KVA for all industrial needs. Diesel engine driven with full maintenance support.", icon: <Icon.Bolt />, badge: "Most Popular", image: "/equipment/generator.jpg" },
+  { title: "Forklift Rental", desc: "Reliable forklift solutions for material handling, loading and unloading operations at industrial sites.", icon: <Icon.Truck />, image: "/equipment/forklift.jpg" },
+  { title: "Construction Equipment", desc: "Excavators, wheel loaders, breakers and more for your heavy-duty construction and industrial projects.", icon: <Icon.HardHat />, image: "/equipment/excavator.jpg" },
+  { title: "Equipment Maintenance", desc: "Preventive and corrective maintenance by certified technicians to keep your equipment running at peak performance.", icon: <Icon.Wrench />, image: "/equipment/maintenance.jpg" },
+  { title: "Spare Parts Supply", desc: "Genuine Caterpillar and Perkins engine spare parts for generators, forklifts and heavy equipment.", icon: <Icon.Package />, image: "/equipment/parts.jpg" },
+  { title: "Industrial Technical Services", desc: "Expert technical support, installation, troubleshooting and project-based industrial services.", icon: <Icon.Gear />, image: "/equipment/technical.jpg" },
 ];
 
 function ServicesSection({ setActivePage }) {
@@ -614,26 +614,47 @@ function ServicesSection({ setActivePage }) {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {services.map((s, i) => (
             <FadeSection key={s.title} style={{ transitionDelay: `${i * 80}ms` }}>
-              <div className="group h-full rounded-xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl relative overflow-hidden"
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(34,197,94,0.12)" }}>
-                {s.badge && (
-                  <div className="absolute top-4 right-4 text-xs font-bold px-2 py-0.5 rounded"
-                    style={{ background: "#22c55e", color: "#0a1628", fontFamily: "'Barlow Condensed', sans-serif" }}>
-                    {s.badge}
+              <div className="group h-full rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl relative overflow-hidden"
+                style={{ border: "1px solid rgba(34,197,94,0.12)", minHeight: 280 }}>
+
+                {/* Background photo — covers the full card */}
+                <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-110"
+                  style={{
+                    backgroundImage: `url(${s.image})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundColor: "#0d1f3a", // shows while image loads / if it 404s, avoids a flash of white
+                  }} />
+
+                {/* Dark transparency overlay — darker by default for text readability,
+                    lightens slightly on hover to let the photo show through more clearly */}
+                <div className="absolute inset-0 transition-all duration-300"
+                  style={{ background: "linear-gradient(180deg, rgba(10,22,40,0.55) 0%, rgba(10,22,40,0.88) 75%)" }} />
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{ background: "rgba(34,197,94,0.12)" }} />
+
+                {/* Content sits above both overlay layers */}
+                <div className="relative p-6 h-full flex flex-col">
+                  {s.badge && (
+                    <div className="absolute top-0 right-0 text-xs font-bold px-2 py-0.5 rounded"
+                      style={{ background: "#22c55e", color: "#0a1628", fontFamily: "'Barlow Condensed', sans-serif" }}>
+                      {s.badge}
+                    </div>
+                  )}
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 transition-all group-hover:scale-110"
+                    style={{ background: "rgba(34,197,94,0.18)", border: "1px solid rgba(34,197,94,0.4)", backdropFilter: "blur(4px)" }}>
+                    <span style={{ color: "#22c55e" }}>{s.icon}</span>
                   </div>
-                )}
-                <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 transition-all group-hover:scale-110"
-                  style={{ background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.3)" }}>
-                  <span style={{ color: "#22c55e" }}>{s.icon}</span>
+                  <h3 className="font-black text-lg mb-2" style={{ color: "white", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.04em", textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}>
+                    {s.title.toUpperCase()}
+                  </h3>
+                  <p className="text-sm leading-relaxed mb-4 flex-1" style={{ color: "#c8d8ea", textShadow: "0 1px 3px rgba(0,0,0,0.4)" }}>{s.desc}</p>
+                  <button onClick={() => setActivePage("Quote")} className="flex items-center gap-2 text-xs font-bold tracking-wider transition-colors hover:gap-3"
+                    style={{ color: "#22c55e", fontFamily: "'Barlow Condensed', sans-serif" }}>
+                    REQUEST SERVICE <Icon.Arrow />
+                  </button>
                 </div>
-                <h3 className="font-black text-lg mb-2" style={{ color: "white", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.04em" }}>
-                  {s.title.toUpperCase()}
-                </h3>
-                <p className="text-sm leading-relaxed mb-4" style={{ color: "#8fadc8" }}>{s.desc}</p>
-                <button onClick={() => setActivePage("Quote")} className="flex items-center gap-2 text-xs font-bold tracking-wider transition-colors hover:gap-3"
-                  style={{ color: "#22c55e", fontFamily: "'Barlow Condensed', sans-serif" }}>
-                  REQUEST SERVICE <Icon.Arrow />
-                </button>
+
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 transition-all duration-300 group-hover:opacity-100 opacity-0"
                   style={{ background: "linear-gradient(90deg, transparent, #22c55e, transparent)" }} />
               </div>
@@ -662,6 +683,9 @@ function EquipmentSection({ setActivePage }) {
     cat:   (e.category || "").toUpperCase(),
     specs: e.specs && e.specs.length ? e.specs : [e.make, e.model, e.capacity].filter(Boolean),
     avail: e.is_available,
+    // FIX: previously image_url was never read at all — every card showed
+    // the icon placeholder regardless of whether a real photo existed.
+    image: e.image_url || null,
   }));
 
   const [filter, setFilter] = useState("ALL");
@@ -710,9 +734,21 @@ function EquipmentSection({ setActivePage }) {
                 <FadeSection key={`${eq.name}-${i}`} style={{ transitionDelay: `${i * 60}ms` }}>
                   <div className="rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                     style={{ background: "white", border: "1px solid #e2e8f0" }}>
-                    <div className="h-44 relative flex items-center justify-center"
-                      style={{ background: "linear-gradient(135deg, #0a1628 0%, #0d1f3a 100%)" }}>
-                      <div className="text-center">
+                    <div className="h-44 relative flex items-center justify-center overflow-hidden"
+                      style={eq.image ? {} : { background: "linear-gradient(135deg, #0a1628 0%, #0d1f3a 100%)" }}>
+                      {eq.image ? (
+                        <>
+                          <img src={eq.image} alt={eq.name} className="absolute inset-0 w-full h-full object-cover"
+                            onError={e => { e.target.style.display = "none"; e.target.nextSibling.style.display = "flex"; }} />
+                          {/* Dark gradient overlay so the AVAILABLE/IN USE badge and category label stay readable over any photo */}
+                          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(10,22,40,0.15) 0%, rgba(10,22,40,0.65) 100%)" }} />
+                          <div className="relative text-center">
+                            <div className="text-xs font-bold tracking-widest" style={{ color: "#22c55e", fontFamily: "'Barlow Condensed', sans-serif", textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>{eq.cat}</div>
+                          </div>
+                        </>
+                      ) : null}
+                      {/* Icon fallback — shown by default when no image_url exists, and re-shown via onError above if the image URL is broken/unreachable */}
+                      <div className="text-center" style={{ display: eq.image ? "none" : "block" }}>
                         <div className="w-16 h-16 mx-auto mb-2 rounded-full flex items-center justify-center" style={{ background: "rgba(34,197,94,0.12)", border: "2px solid rgba(34,197,94,0.3)" }}>
                           <span style={{ color: "#22c55e", transform: "scale(1.8)", display: "block" }}>
                             {eq.cat === "GENERATOR" ? <Icon.Bolt /> : eq.cat === "FORKLIFT" ? <Icon.Truck /> : eq.cat === "PARTS" ? <Icon.Package /> : <Icon.HardHat />}
