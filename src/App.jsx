@@ -1637,5 +1637,5 @@ function Leads() {
                 )}
               </select>
 
-              
+              {/* Convert to Client button - show for ANY lead not already */}
        
