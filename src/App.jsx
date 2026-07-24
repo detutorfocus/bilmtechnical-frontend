@@ -418,7 +418,7 @@ function HeroSection({ setActivePage, onPortalLogin }) {
       years: Number(publicSettings?.years_experience) || 20,
       projects: Number(publicSettings?.projects_completed) || 200,
       fleet: Number(publicSettings?.fleet_size) || 10,
-      staff: Number(publicSettings?.staff_count) || 25,
+      staff: Number(publicSettings?.staff_count) || 15,
     };
     const timer = setTimeout(() => {
       const steps = 60;
