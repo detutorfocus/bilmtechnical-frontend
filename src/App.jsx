@@ -407,9 +407,19 @@ function SectionHeader({ tag, title, accent, subtitle, light = false }) {
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 function HeroSection({ setActivePage, onPortalLogin }) {
   const [counter, setCounter] = useState({ years: 0, projects: 0, fleet: 0, staff: 0 });
-  const targets = { years: 20, projects: 500, fleet: 80, staff: 45 };
+  // Pull live stats from the public settings endpoint (unauthenticated —
+  // apiFetch only adds the Authorization header when a token exists).
+  // Falls back to the old hardcoded defaults if a setting hasn't been
+  // configured yet or the fetch hasn't resolved.
+  const { data: publicSettings } = useApi("/settings/public");
 
   useEffect(() => {
+    const targets = {
+      years: Number(publicSettings?.years_experience) || 20,
+      projects: Number(publicSettings?.projects_completed) || 500,
+      fleet: Number(publicSettings?.fleet_size) || 80,
+      staff: Number(publicSettings?.staff_count) || 45,
+    };
     const timer = setTimeout(() => {
       const steps = 60;
       let step = 0;
@@ -426,7 +436,7 @@ function HeroSection({ setActivePage, onPortalLogin }) {
       }, 2000 / steps);
     }, 800);
     return () => clearTimeout(timer);
-  }, []);
+  }, [publicSettings]);
 
   const stats = [
     { val: counter.years + "+", label: "Years Experience" },
