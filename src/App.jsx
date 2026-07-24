@@ -416,9 +416,9 @@ function HeroSection({ setActivePage, onPortalLogin }) {
   useEffect(() => {
     const targets = {
       years: Number(publicSettings?.years_experience) || 20,
-      projects: Number(publicSettings?.projects_completed) || 500,
-      fleet: Number(publicSettings?.fleet_size) || 80,
-      staff: Number(publicSettings?.staff_count) || 45,
+      projects: Number(publicSettings?.projects_completed) || 200,
+      fleet: Number(publicSettings?.fleet_size) || 10,
+      staff: Number(publicSettings?.staff_count) || 25,
     };
     const timer = setTimeout(() => {
       const steps = 60;
