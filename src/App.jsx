@@ -71,19 +71,42 @@ function AuthProvider({ children }) {
       apiFetch("/auth/me").then(setUser).catch(() => localStorage.removeItem("bilm_token")).finally(() => setReady(true));
     } else setReady(true);
   }, []);
-  const login = async (email, password) => {
+  /**
+   * Step 1 of 2. Posts email+password to /auth/login. The backend returns
+   * {otp_required, message} instead of a token directly — it emails a
+   * 6-digit code and waits for verifyOtp() below to actually complete
+   * the sign-in.
+   */
+  const requestOtp = async (email, password) => {
     const form = new URLSearchParams({ username: email, password });
-    const data = await fetch(`${API}/auth/login`, {
+    const res = await fetch(`${API}/auth/login`, {
       method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: form,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || "Login failed");
+    return data; // { otp_required: true, message: "A verification code was sent to ..." }
+  };
+
+  /**
+   * Step 2 of 2. Posts the emailed code to /auth/verify-otp. On success
+   * returns a real access_token — same shape the old single-step
+   * /auth/login used to return directly.
+   */
+  const verifyOtp = async (email, code) => {
+    const data = await fetch(`${API}/auth/verify-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, code }),
     }).then(r => r.json());
-    if (!data.access_token) throw new Error(data.detail || "Login failed");
+    if (!data.access_token) throw new Error(data.detail || "Invalid or expired code");
     localStorage.setItem("bilm_token", data.access_token);
     const me = await apiFetch("/auth/me");
     setUser(me);
     return me;
   };
+
   const logout = () => { localStorage.removeItem("bilm_token"); setUser(null); };
-  return <AuthCtx.Provider value={{ user, login, logout, ready }}>{children}</AuthCtx.Provider>;
+  return <AuthCtx.Provider value={{ user, requestOtp, verifyOtp, logout, ready }}>{children}</AuthCtx.Provider>;
 }
 
 const useAuth = () => useContext(AuthCtx);
@@ -407,19 +430,9 @@ function SectionHeader({ tag, title, accent, subtitle, light = false }) {
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 function HeroSection({ setActivePage, onPortalLogin }) {
   const [counter, setCounter] = useState({ years: 0, projects: 0, fleet: 0, staff: 0 });
-  // Pull live stats from the public settings endpoint (unauthenticated —
-  // apiFetch only adds the Authorization header when a token exists).
-  // Falls back to the old hardcoded defaults if a setting hasn't been
-  // configured yet or the fetch hasn't resolved.
-  const { data: publicSettings } = useApi("/settings/public");
+  const targets = { years: 20, projects: 500, fleet: 80, staff: 45 };
 
   useEffect(() => {
-    const targets = {
-      years: Number(publicSettings?.years_experience) || 20,
-      projects: Number(publicSettings?.projects_completed) || 200,
-      fleet: Number(publicSettings?.fleet_size) || 10,
-      staff: Number(publicSettings?.staff_count) || 15,
-    };
     const timer = setTimeout(() => {
       const steps = 60;
       let step = 0;
@@ -436,7 +449,7 @@ function HeroSection({ setActivePage, onPortalLogin }) {
       }, 2000 / steps);
     }, 800);
     return () => clearTimeout(timer);
-  }, [publicSettings]);
+  }, []);
 
   const stats = [
     { val: counter.years + "+", label: "Years Experience" },
@@ -1198,17 +1211,38 @@ function LandingPage({ onPortalLogin }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function LoginPage({ onBackToSite }) {
-  const { login } = useAuth();
+  const { requestOtp, verifyOtp } = useAuth();
+
+  // step: "password" -> "otp". Starts on password, advances to otp once
+  // requestOtp() succeeds (i.e. password was correct and a code was emailed).
+  const [step, setStep] = useState("password");
   const [form, setForm] = useState({ email: "", password: "" });
+  const [code, setCode] = useState("");
   const [err, setErr] = useState("");
+  const [info, setInfo] = useState(""); // "A verification code was sent to ..."
   const [loading, setLoading] = useState(false);
 
-  const submit = async () => {
+  const submitPassword = async () => {
     if (!form.email || !form.password) return setErr("Please fill in both fields");
     setErr(""); setLoading(true);
-    try { await login(form.email, form.password); }
+    try {
+      const res = await requestOtp(form.email, form.password);
+      setInfo(res.message || `A verification code was sent to ${form.email}.`);
+      setStep("otp");
+    } catch (e) { setErr(e.message); }
+    finally { setLoading(false); }
+  };
+
+  const submitCode = async () => {
+    if (!code || code.length !== 6) return setErr("Enter the 6-digit code from your email");
+    setErr(""); setLoading(true);
+    try { await verifyOtp(form.email, code); }
     catch (e) { setErr(e.message); }
     finally { setLoading(false); }
+  };
+
+  const backToPassword = () => {
+    setStep("password"); setCode(""); setErr(""); setInfo("");
   };
 
   return (
@@ -1216,7 +1250,6 @@ function LoginPage({ onBackToSite }) {
       style={{ background: `radial-gradient(ellipse at 50% 0%, rgba(34,197,94,0.08) 0%, #060e1c 60%)` }}>
       <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "linear-gradient(rgba(34,197,94,0.5) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,0.5) 1px,transparent 1px)", backgroundSize: "48px 48px" }} />
 
-      {/* Back to website button */}
       <button onClick={onBackToSite}
         className="absolute top-5 left-5 flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-all hover:opacity-80"
         style={{ background: "rgba(34,197,94,0.08)", color: G.green, border: `1px solid ${G.green}30`, fontFamily: "Barlow Condensed,sans-serif", letterSpacing: "0.08em" }}>
@@ -1236,31 +1269,67 @@ function LoginPage({ onBackToSite }) {
         <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(13,27,46,0.95)", border: "1px solid rgba(34,197,94,0.2)", boxShadow: "0 25px 60px rgba(0,0,0,0.5)" }}>
           <div className="h-1" style={{ background: "linear-gradient(90deg,transparent,#22c55e,transparent)" }} />
           <div className="p-8">
-            <div className="font-black text-lg tracking-widest mb-6" style={{ color: "white", fontFamily: "Barlow Condensed,sans-serif" }}>SIGN IN</div>
-            {err && (
-              <div className="mb-4 px-3 py-2.5 rounded-lg text-xs font-semibold" style={{ background: "rgba(239,68,68,0.1)", color: G.red, border: "1px solid rgba(239,68,68,0.2)" }}>{err}</div>
+
+            {step === "password" ? (
+              <>
+                <div className="font-black text-lg tracking-widest mb-6" style={{ color: "white", fontFamily: "Barlow Condensed,sans-serif" }}>SIGN IN</div>
+                {err && (
+                  <div className="mb-4 px-3 py-2.5 rounded-lg text-xs font-semibold" style={{ background: "rgba(239,68,68,0.1)", color: G.red, border: "1px solid rgba(239,68,68,0.2)" }}>{err}</div>
+                )}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold tracking-widest mb-2" style={{ color: G.muted, fontFamily: "Barlow Condensed,sans-serif" }}>EMAIL ADDRESS</label>
+                    <input type="email" value={form.email} placeholder="admin@bilmtechnical.com"
+                      onChange={e => setForm(v => ({ ...v, email: e.target.value }))}
+                      onKeyDown={e => e.key === "Enter" && submitPassword()}
+                      style={{ ...INP, border: err ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(34,197,94,0.2)" }} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold tracking-widest mb-2" style={{ color: G.muted, fontFamily: "Barlow Condensed,sans-serif" }}>PASSWORD</label>
+                    <input type="password" value={form.password} placeholder="••••••••"
+                      onChange={e => setForm(v => ({ ...v, password: e.target.value }))}
+                      onKeyDown={e => e.key === "Enter" && submitPassword()}
+                      style={{ ...INP, border: err ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(34,197,94,0.2)" }} />
+                  </div>
+                  <button onClick={submitPassword} disabled={loading}
+                    className="w-full py-3.5 font-black text-sm tracking-widest rounded-lg transition-all duration-200"
+                    style={{ background: loading ? "rgba(34,197,94,0.5)" : "#22c55e", color: "#060e1c", fontFamily: "Barlow Condensed,sans-serif", boxShadow: loading ? "none" : "0 4px 20px rgba(34,197,94,0.3)", cursor: loading ? "not-allowed" : "pointer" }}>
+                    {loading ? <span className="flex items-center justify-center gap-2"><Spinner /> SENDING CODE...</span> : "CONTINUE →"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="font-black text-lg tracking-widest mb-2" style={{ color: "white", fontFamily: "Barlow Condensed,sans-serif" }}>ENTER CODE</div>
+                {info && (
+                  <div className="mb-4 text-xs" style={{ color: G.muted, lineHeight: 1.5 }}>{info}</div>
+                )}
+                {err && (
+                  <div className="mb-4 px-3 py-2.5 rounded-lg text-xs font-semibold" style={{ background: "rgba(239,68,68,0.1)", color: G.red, border: "1px solid rgba(239,68,68,0.2)" }}>{err}</div>
+                )}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold tracking-widest mb-2" style={{ color: G.muted, fontFamily: "Barlow Condensed,sans-serif" }}>6-DIGIT CODE</label>
+                    <input type="text" inputMode="numeric" maxLength={6} value={code}
+                      placeholder="000000" autoFocus
+                      onChange={e => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      onKeyDown={e => e.key === "Enter" && submitCode()}
+                      style={{ ...INP, border: err ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(34,197,94,0.2)", letterSpacing: "0.4em", textAlign: "center", fontSize: "1.1rem" }} />
+                  </div>
+                  <button onClick={submitCode} disabled={loading}
+                    className="w-full py-3.5 font-black text-sm tracking-widest rounded-lg transition-all duration-200"
+                    style={{ background: loading ? "rgba(34,197,94,0.5)" : "#22c55e", color: "#060e1c", fontFamily: "Barlow Condensed,sans-serif", boxShadow: loading ? "none" : "0 4px 20px rgba(34,197,94,0.3)", cursor: loading ? "not-allowed" : "pointer" }}>
+                    {loading ? <span className="flex items-center justify-center gap-2"><Spinner /> VERIFYING...</span> : "VERIFY & SIGN IN →"}
+                  </button>
+                  <button onClick={backToPassword}
+                    className="w-full py-2 text-xs font-bold tracking-widest"
+                    style={{ color: G.muted, fontFamily: "Barlow Condensed,sans-serif" }}>
+                    ← BACK / RESEND CODE
+                  </button>
+                </div>
+              </>
             )}
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold tracking-widest mb-2" style={{ color: G.muted, fontFamily: "Barlow Condensed,sans-serif" }}>EMAIL ADDRESS</label>
-                <input type="email" value={form.email} placeholder="admin@bilmtechnical.com"
-                  onChange={e => setForm(v => ({ ...v, email: e.target.value }))}
-                  onKeyDown={e => e.key === "Enter" && submit()}
-                  style={{ ...INP, border: err ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(34,197,94,0.2)" }} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold tracking-widest mb-2" style={{ color: G.muted, fontFamily: "Barlow Condensed,sans-serif" }}>PASSWORD</label>
-                <input type="password" value={form.password} placeholder="••••••••"
-                  onChange={e => setForm(v => ({ ...v, password: e.target.value }))}
-                  onKeyDown={e => e.key === "Enter" && submit()}
-                  style={{ ...INP, border: err ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(34,197,94,0.2)" }} />
-              </div>
-              <button onClick={submit} disabled={loading}
-                className="w-full py-3.5 font-black text-sm tracking-widest rounded-lg transition-all duration-200"
-                style={{ background: loading ? "rgba(34,197,94,0.5)" : "#22c55e", color: "#060e1c", fontFamily: "Barlow Condensed,sans-serif", boxShadow: loading ? "none" : "0 4px 20px rgba(34,197,94,0.3)", cursor: loading ? "not-allowed" : "pointer" }}>
-                {loading ? <span className="flex items-center justify-center gap-2"><Spinner /> SIGNING IN...</span> : "SIGN IN →"}
-              </button>
-            </div>
+
           </div>
         </div>
         <p className="text-center text-xs mt-5" style={{ color: "rgba(90,122,154,0.6)", fontFamily: "Barlow Condensed,sans-serif", letterSpacing: "0.1em" }}>
