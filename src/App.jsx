@@ -430,7 +430,7 @@ function SectionHeader({ tag, title, accent, subtitle, light = false }) {
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 function HeroSection({ setActivePage, onPortalLogin }) {
   const [counter, setCounter] = useState({ years: 0, projects: 0, fleet: 0, staff: 0 });
-  const targets = { years: 20, projects: 500, fleet: 80, staff: 45 };
+  const targets = { years: 20, projects: 200, fleet: 10, staff: 15 };
 
   useEffect(() => {
     const timer = setTimeout(() => {
