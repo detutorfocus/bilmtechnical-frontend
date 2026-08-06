@@ -457,7 +457,7 @@ function SectionHeader({ tag, title, accent, subtitle, light = false }) {
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 function HeroSection({ setActivePage, onPortalLogin }) {
   const [counter, setCounter] = useState({ years: 0, projects: 0, fleet: 0, staff: 0 });
-  const targets = { years: 20, projects: 500, fleet: 80, staff: 45 };
+  const targets = { years: 20, projects: 400, fleet: 10, staff: 15 };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -981,7 +981,7 @@ function ContactSection() {
         <div className="grid md:grid-cols-3 gap-6">
           {[
             { icon: <Icon.Phone />, title: "CALL US", lines: ["08037815188", "+234 803 781 5188"] },
-            { icon: <Icon.Mail />, title: "EMAIL US", lines: ["Biali.kandi@gmail.com", "info@bilmtechnical.com"] },
+            { icon: <Icon.Mail />, title: "EMAIL US", lines: ["admin@bilmtechnical.com", "info@bilmtechnical.com"] },
             { icon: <Icon.MapPin />, title: "VISIT US", lines: ["23 Chief Nwuke Street", "Trans Amadi Industrial Layout", "Port Harcourt, Rivers State"] },
           ].map(c => (
             <FadeSection key={c.title}>
@@ -1028,7 +1028,7 @@ function SiteFooter({ setActivePage, onPortalLogin }) {
             <div className="text-xs font-bold tracking-widest mb-4" style={{ color: "#22c55e", fontFamily: "'Barlow Condensed', sans-serif" }}>CONTACT INFO</div>
             <div className="space-y-2 text-sm" style={{ color: "#8fadc8", fontFamily: "'Barlow', sans-serif" }}>
               <div>08037815188</div>
-              <div>Biali.kandi@gmail.com</div>
+              <div>admin@bilmtechnical.com</div>
               <div>Trans Amadi Industrial Layout</div>
               <div>Port Harcourt, Rivers State</div>
               <div>Nigeria</div>
@@ -1037,10 +1037,10 @@ function SiteFooter({ setActivePage, onPortalLogin }) {
         </div>
         <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
           <div className="text-xs" style={{ color: "#4a5568", fontFamily: "'Barlow', sans-serif" }}>
-            © 2025 Bilm Technical Services. All rights reserved. Ref: BTS/IL/0069
+            © 2026 Bilm Technical Services. All rights reserved. Ref: BTS/IL/0069
           </div>
           <div className="text-xs" style={{ color: "#4a5568", fontFamily: "'Barlow', sans-serif" }}>
-            Built with React + FastAPI · Port Harcourt, Nigeria
+            Port Harcourt, Nigeria
           </div>
         </div>
       </div>
