@@ -60,6 +60,33 @@ async function apiFetch(path, opts = {}) {
   return res.json();
 }
 
+/**
+ * Dedicated file-upload helper — deliberately NOT built on apiFetch, since
+ * apiFetch hardcodes "Content-Type": "application/json", which is wrong
+ * for file uploads. FormData needs the browser to set its own
+ * "multipart/form-data; boundary=..." header automatically — manually
+ * setting Content-Type here would break the upload silently.
+ * Posts to POST /api/upload/image, returns the Cloudinary URL string.
+ */
+async function uploadImage(file) {
+  const token = localStorage.getItem("bilm_token");
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(`${API}/upload/image`, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: formData,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    const message = typeof err.detail === "string" ? err.detail : "Upload failed";
+    throw new Error(message);
+  }
+  const data = await res.json();
+  return data.url; // matches { "url": result["secure_url"] } from the backend
+}
+
 const AuthCtx = createContext(null);
 
 function AuthProvider({ children }) {
@@ -430,7 +457,7 @@ function SectionHeader({ tag, title, accent, subtitle, light = false }) {
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 function HeroSection({ setActivePage, onPortalLogin }) {
   const [counter, setCounter] = useState({ years: 0, projects: 0, fleet: 0, staff: 0 });
-  const targets = { years: 20, projects: 200, fleet: 10, staff: 15 };
+  const targets = { years: 20, projects: 500, fleet: 80, staff: 45 };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -2174,6 +2201,22 @@ function Equipment() {
   const [form, setForm]       = useState(emptyForm);
   const [saving, setSaving]   = useState(false);
   const [formErr, setFormErr] = useState("");
+  const [uploading, setUploading] = useState(false); // true while the image is actively uploading to Cloudinary
+
+  const handleImageSelect = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setFormErr("");
+    try {
+      const url = await uploadImage(file);
+      setForm(v => ({ ...v, image_url: url }));
+    } catch (err) {
+      setFormErr(`Image upload failed: ${err.message}`);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const INP = {
     background: "rgba(255,255,255,0.05)", border: `1px solid ${G.border}`,
@@ -2345,9 +2388,30 @@ function Equipment() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>IMAGE URL</label>
-              <input value={form.image_url} onChange={e => setForm(v => ({ ...v, image_url: e.target.value }))}
-                placeholder="https://... (shown on the public website's Equipment Showcase)" style={INP} />
+              <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>EQUIPMENT PHOTO</label>
+              <div className="flex items-center gap-3">
+                <label className="px-4 py-2.5 text-xs font-bold rounded-lg cursor-pointer transition-all"
+                  style={{ background: uploading ? "rgba(34,197,94,0.15)" : G.gdim, color: G.green, border: `1px solid ${G.green}40`, fontFamily: "Barlow Condensed,sans-serif", opacity: uploading ? 0.6 : 1 }}>
+                  {uploading ? "UPLOADING..." : "CHOOSE PHOTO"}
+                  <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageSelect}
+                    disabled={uploading} style={{ display: "none" }} />
+                </label>
+                {uploading && <Spinner />}
+                {!uploading && form.image_url && (
+                  <span className="text-xs" style={{ color: G.muted }}>✓ Photo uploaded</span>
+                )}
+              </div>
+              {form.image_url && (
+                <div className="mt-3 relative inline-block">
+                  <img src={form.image_url} alt="Equipment preview" className="rounded-lg object-cover"
+                    style={{ width: 140, height: 100, border: `1px solid ${G.border}` }} />
+                  <button type="button" onClick={() => setForm(v => ({ ...v, image_url: "" }))}
+                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                    style={{ background: G.red, color: "white" }} title="Remove photo">
+                    ✕
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="md:col-span-2">
