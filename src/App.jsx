@@ -465,7 +465,7 @@ function HeroSection({ setActivePage, onPortalLogin }) {
   // Once Settings saving is confirmed working end-to-end, editing these
   // in the admin panel will update the live site with no code changes.
   const { data: publicSettings } = useApi("/settings/public");
-  const targets = {
+  const s = {
     years:    parseInt(publicSettings?.years_experience)   || 20,
     projects: parseInt(publicSettings?.projects_completed) || 200,
     fleet:    parseInt(publicSettings?.fleet_size)          || 10,
@@ -480,10 +480,10 @@ function HeroSection({ setActivePage, onPortalLogin }) {
         step++;
         const ease = 1 - Math.pow(1 - step / steps, 3);
         setCounter({
-          years: Math.floor(targets.years * ease),
-          projects: Math.floor(targets.projects * ease),
-          fleet: Math.floor(targets.fleet * ease),
-          staff: Math.floor(targets.staff * ease),
+          years: Math.floor(s.years * ease),
+          projects: Math.floor(s.projects * ease),
+          fleet: Math.floor(s.fleet * ease),
+          staff: Math.floor(s.staff * ease),
         });
         if (step >= steps) clearInterval(t);
       }, 2000 / steps);
@@ -759,7 +759,7 @@ function EquipmentSection({ setActivePage }) {
                       {eq.image ? (
                         <>
                           <img src={eq.image} alt={eq.name} className="absolute inset-0 w-full h-full object-cover"
-                            onError={e => { e.target.style.display = "none"; e.target.nextSibling.style.display = "flex"; }} />
+                            onError={e => { e..style.display = "none"; e..nextSibling.style.display = "flex"; }} />
                           <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(10,22,40,0.15) 0%, rgba(10,22,40,0.65) 100%)" }} />
                           <div className="relative text-center">
                             <div className="text-xs font-bold tracking-widest" style={{ color: "#22c55e", fontFamily: "'Barlow Condensed', sans-serif", textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>{eq.cat}</div>
@@ -812,7 +812,7 @@ function WhyChooseUs() {
     { icon: <Icon.Gear />, title: "Industrial-Grade Fleet", desc: "Modern, well-maintained Caterpillar and Perkins equipment serviced to manufacturer specifications." },
     { icon: <Icon.Users />, title: "Certified Technical Team", desc: "Constantly trained technicians meeting the highest standards of quality service delivery." },
     { icon: <Icon.Bolt />, title: "Cost-Effective Solutions", desc: "Competitive rental and service rates without compromising on quality, safety, or reliability." },
-    { icon: <Icon.ChartBar />, title: "Proven Track Record", desc: "500+ completed projects across Rivers State and beyond — a trusted name in industrial services." },
+    { icon: <Icon.ChartBar />, title: "Proven Track Record", desc: "200+ completed projects across Rivers State and beyond — a trusted name in industrial services." },
   ];
   return (
     <section className="py-24" style={{ background: "#0a1628" }}>
@@ -939,12 +939,12 @@ function QuoteSection() {
               {[{ key: "name", label: "FULL NAME *", type: "text", placeholder: "Your full name" }, { key: "company", label: "COMPANY NAME", type: "text", placeholder: "Your company" }, { key: "email", label: "EMAIL ADDRESS *", type: "email", placeholder: "email@company.com" }, { key: "phone", label: "PHONE NUMBER", type: "tel", placeholder: "+234 xxx xxx xxxx" }].map(f => (
                 <div key={f.key}>
                   <label style={labelStyle}>{f.label}</label>
-                  <input type={f.type} placeholder={f.placeholder} value={form[f.key]} onChange={e => setForm(v => ({ ...v, [f.key]: e.target.value }))} style={inputStyle} />
+                  <input type={f.type} placeholder={f.placeholder} value={form[f.key]} onChange={e => setForm(v => ({ ...v, [f.key]: e..value }))} style={inputStyle} />
                 </div>
               ))}
               <div>
                 <label style={labelStyle}>SERVICE TYPE *</label>
-                <select value={form.service} onChange={e => setForm(v => ({ ...v, service: e.target.value }))} style={inputStyle}>
+                <select value={form.service} onChange={e => setForm(v => ({ ...v, service: e..value }))} style={inputStyle}>
                   <option value="" style={{ background: "#0a1628" }}>Select service...</option>
                   {["Generator Rental", "Forklift Rental", "Construction Equipment", "Equipment Maintenance", "Spare Parts", "Technical Services"].map(s => (
                     <option key={s} value={s} style={{ background: "#0a1628" }}>{s}</option>
@@ -953,15 +953,15 @@ function QuoteSection() {
               </div>
               <div>
                 <label style={labelStyle}>EQUIPMENT / CAPACITY</label>
-                <input type="text" placeholder="e.g. 200KVA Generator" value={form.equipment} onChange={e => setForm(v => ({ ...v, equipment: e.target.value }))} style={inputStyle} />
+                <input type="text" placeholder="e.g. 200KVA Generator" value={form.equipment} onChange={e => setForm(v => ({ ...v, equipment: e..value }))} style={inputStyle} />
               </div>
               <div className="md:col-span-2">
                 <label style={labelStyle}>RENTAL DURATION / TIMELINE</label>
-                <input type="text" placeholder="e.g. 3 months, ongoing, 1 week..." value={form.duration} onChange={e => setForm(v => ({ ...v, duration: e.target.value }))} style={inputStyle} />
+                <input type="text" placeholder="e.g. 3 months, ongoing, 1 week..." value={form.duration} onChange={e => setForm(v => ({ ...v, duration: e..value }))} style={inputStyle} />
               </div>
               <div className="md:col-span-2">
                 <label style={labelStyle}>PROJECT DESCRIPTION</label>
-                <textarea rows={4} placeholder="Describe your project, requirements, and any specific needs..." value={form.description} onChange={e => setForm(v => ({ ...v, description: e.target.value }))} style={{ ...inputStyle, resize: "vertical" }} />
+                <textarea rows={4} placeholder="Describe your project, requirements, and any specific needs..." value={form.description} onChange={e => setForm(v => ({ ...v, description: e..value }))} style={{ ...inputStyle, resize: "vertical" }} />
               </div>
             </div>
             {error && (
@@ -1200,7 +1200,7 @@ function VisitorChatWidget() {
             // First-time visitor: ask for a name before starting chat
             <div className="p-4 flex-1 flex flex-col gap-3">
               <div className="text-xs" style={{ color: G.muted }}>What's your name? So our team knows who they're talking to.</div>
-              <input value={name} onChange={e => setName(e.target.value)}
+              <input value={name} onChange={e => setName(e..value)}
                 onKeyDown={e => e.key === "Enter" && saveName()}
                 placeholder="Your name" autoFocus
                 className="px-3 py-2 rounded-lg text-sm" style={{ background: "rgba(255,255,255,0.05)", border: `1px solid ${G.border}`, color: "white", outline: "none" }} />
@@ -1234,7 +1234,7 @@ function VisitorChatWidget() {
 
               {/* Input */}
               <div className="p-3 flex gap-2" style={{ borderTop: `1px solid ${G.border}` }}>
-                <input value={input} onChange={e => setInput(e.target.value)}
+                <input value={input} onChange={e => setInput(e..value)}
                   onKeyDown={e => e.key === "Enter" && send()}
                   placeholder="Type a message..."
                   className="flex-1 px-3 py-2 rounded-lg text-xs" style={{ background: "rgba(255,255,255,0.05)", border: `1px solid ${G.border}`, color: "white", outline: "none" }} />
@@ -1317,7 +1317,7 @@ function LoginPage({ onBackToSite }) {
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-4"
             style={{ background: "rgba(34,197,94,0.08)", border: "2px solid rgba(34,197,94,0.3)" }}>
-            <img src={LOGO} alt="Bilm" style={{ height: 48, width: "auto", objectFit: "contain", display: "block" }} onError={e => { e.target.style.display = "none"; }} />
+            <img src={LOGO} alt="Bilm" style={{ height: 48, width: "auto", objectFit: "contain", display: "block" }} onError={e => { e..style.display = "none"; }} />
           </div>
           <div className="font-black text-2xl tracking-widest" style={{ color: "white", fontFamily: "Barlow Condensed,sans-serif" }}>BILM TECHNICAL</div>
           <div className="text-xs tracking-widest mt-1 font-semibold" style={{ color: G.green, fontFamily: "Barlow Condensed,sans-serif" }}>ADMIN & CLIENT PORTAL</div>
@@ -1337,14 +1337,14 @@ function LoginPage({ onBackToSite }) {
                   <div>
                     <label className="block text-xs font-bold tracking-widest mb-2" style={{ color: G.muted, fontFamily: "Barlow Condensed,sans-serif" }}>EMAIL ADDRESS</label>
                     <input type="email" value={form.email} placeholder="admin@bilmtechnical.com"
-                      onChange={e => setForm(v => ({ ...v, email: e.target.value }))}
+                      onChange={e => setForm(v => ({ ...v, email: e..value }))}
                       onKeyDown={e => e.key === "Enter" && submitPassword()}
                       style={{ ...INP, border: err ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(34,197,94,0.2)" }} />
                   </div>
                   <div>
                     <label className="block text-xs font-bold tracking-widest mb-2" style={{ color: G.muted, fontFamily: "Barlow Condensed,sans-serif" }}>PASSWORD</label>
                     <input type="password" value={form.password} placeholder="••••••••"
-                      onChange={e => setForm(v => ({ ...v, password: e.target.value }))}
+                      onChange={e => setForm(v => ({ ...v, password: e..value }))}
                       onKeyDown={e => e.key === "Enter" && submitPassword()}
                       style={{ ...INP, border: err ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(34,197,94,0.2)" }} />
                   </div>
@@ -1369,7 +1369,7 @@ function LoginPage({ onBackToSite }) {
                     <label className="block text-xs font-bold tracking-widest mb-2" style={{ color: G.muted, fontFamily: "Barlow Condensed,sans-serif" }}>6-DIGIT CODE</label>
                     <input type="text" inputMode="numeric" maxLength={6} value={code}
                       placeholder="000000" autoFocus
-                      onChange={e => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      onChange={e => setCode(e..value.replace(/\D/g, "").slice(0, 6))}
                       onKeyDown={e => e.key === "Enter" && submitCode()}
                       style={{ ...INP, border: err ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(34,197,94,0.2)", letterSpacing: "0.4em", textAlign: "center", fontSize: "1.1rem" }} />
                   </div>
@@ -1430,7 +1430,7 @@ function Sidebar({ active, setActive, open, setOpen, user, onBackToSite }) {
         <div className="px-5 py-5 flex items-center gap-3" style={{ borderBottom: `1px solid ${G.border}` }}>
           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
             style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: "8px", padding: "4px" }}>
-            <img src={LOGO} alt="Bilm" style={{ height: 28, width: "auto", objectFit: "contain", display: "block" }} onError={e => { e.target.style.display = "none"; }} />
+            <img src={LOGO} alt="Bilm" style={{ height: 28, width: "auto", objectFit: "contain", display: "block" }} onError={e => { e..style.display = "none"; }} />
           </div>
           <div>
             <div className="font-black text-sm tracking-wider" style={{ color: "white", fontFamily: "Barlow Condensed,sans-serif" }}>BILM TECHNICAL</div>
@@ -1623,7 +1623,7 @@ function Leads() {
             </button>
           ))}
         </div>
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search company..."
+        <input value={search} onChange={e => setSearch(e..value)} placeholder="Search company..."
           style={{ ...INP, width: 200, padding: "0.5rem 0.75rem" }} />
       </div>
 
@@ -1661,7 +1661,7 @@ function Leads() {
                   "lost" stays out too since it's a terminal state that should only
                   happen deliberately, not via casual dropdown browsing. */}
               <select value={["new","warm","hot","cold"].includes(l.status) ? l.status : "new"}
-                onChange={e => updateStatus(l.id, e.target.value)}
+                onChange={e => updateStatus(l.id, e..value)}
                 className="flex-1 text-xs font-bold rounded-lg px-2 py-1.5"
                 style={{ background: "rgba(255,255,255,0.05)", border: `1px solid ${G.border}`, color: G.green, fontFamily: "Barlow Condensed,sans-serif", outline: "none" }}>
                 {["new", "warm", "hot", "cold"].map(s =>
@@ -1793,7 +1793,7 @@ function Quotes() {
                         <input
                           type="number"
                           value={editAmt}
-                          onChange={e => setEditAmt(e.target.value)}
+                          onChange={e => setEditAmt(e..value)}
                           onKeyDown={e => { if (e.key === "Enter") saveAmount(q.id); if (e.key === "Escape") setEditing(null); }}
                           autoFocus
                           className="w-28 px-2 py-1 rounded text-xs"
@@ -2031,22 +2031,22 @@ function Rentals() {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="col-span-2">
                       <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>COMPANY NAME *</label>
-                      <input value={nc.company_name} onChange={e => setNc(v => ({ ...v, company_name: e.target.value }))}
+                      <input value={nc.company_name} onChange={e => setNc(v => ({ ...v, company_name: e..value }))}
                         placeholder="e.g. Shell Nigeria Exploration" style={INP} />
                     </div>
                     <div>
                       <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>CONTACT PERSON</label>
-                      <input value={nc.contact_person} onChange={e => setNc(v => ({ ...v, contact_person: e.target.value }))}
+                      <input value={nc.contact_person} onChange={e => setNc(v => ({ ...v, contact_person: e..value }))}
                         placeholder="Full name" style={INP} />
                     </div>
                     <div>
                       <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>EMAIL *</label>
-                      <input type="email" value={nc.email} onChange={e => setNc(v => ({ ...v, email: e.target.value }))}
+                      <input type="email" value={nc.email} onChange={e => setNc(v => ({ ...v, email: e..value }))}
                         placeholder="contact@company.com" style={INP} />
                     </div>
                     <div>
                       <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>PHONE</label>
-                      <input value={nc.phone} onChange={e => setNc(v => ({ ...v, phone: e.target.value }))}
+                      <input value={nc.phone} onChange={e => setNc(v => ({ ...v, phone: e..value }))}
                         placeholder="+234 xxx xxx xxxx" style={INP} />
                     </div>
                     <div className="flex items-end">
@@ -2061,7 +2061,7 @@ function Rentals() {
               )}
 
               {/* Client dropdown */}
-              <select value={form.client_id} onChange={e => setForm(v => ({ ...v, client_id: e.target.value }))} style={INP}>
+              <select value={form.client_id} onChange={e => setForm(v => ({ ...v, client_id: e..value }))} style={INP}>
                 <option value="" style={{ background: "#0d1b2e" }}>
                   {clients.length === 0 ? "No clients yet — create one above ↑" : "Select client..."}
                 </option>
@@ -2082,7 +2082,7 @@ function Rentals() {
             {/* ── EQUIPMENT ─────────────────────────────────────────────── */}
             <div className="md:col-span-2">
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>EQUIPMENT *</label>
-              <select value={form.equipment_id} onChange={e => setForm(v => ({ ...v, equipment_id: e.target.value }))} style={INP}>
+              <select value={form.equipment_id} onChange={e => setForm(v => ({ ...v, equipment_id: e..value }))} style={INP}>
                 <option value="" style={{ background: "#0d1b2e" }}>
                   {equipment.filter(e => e.is_available).length === 0 ? "No available equipment — add some in the database first" : "Select equipment..."}
                 </option>
@@ -2103,11 +2103,11 @@ function Rentals() {
             {/* ── DATES ─────────────────────────────────────────────────── */}
             <div>
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>START DATE *</label>
-              <input type="date" value={form.start_date} onChange={e => setForm(v => ({ ...v, start_date: e.target.value }))} style={INP} />
+              <input type="date" value={form.start_date} onChange={e => setForm(v => ({ ...v, start_date: e..value }))} style={INP} />
             </div>
             <div>
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>END DATE *</label>
-              <input type="date" value={form.end_date} onChange={e => setForm(v => ({ ...v, end_date: e.target.value }))} style={INP} />
+              <input type="date" value={form.end_date} onChange={e => setForm(v => ({ ...v, end_date: e..value }))} style={INP} />
             </div>
 
             {/* ── RATE + LOCATION ───────────────────────────────────────── */}
@@ -2117,19 +2117,19 @@ function Rentals() {
                 <span className="ml-1 font-normal" style={{ color: G.muted }}>— leave blank to use equipment default</span>
               </label>
               <input type="number" placeholder="e.g. 250000" value={form.monthly_rate}
-                onChange={e => setForm(v => ({ ...v, monthly_rate: e.target.value }))} style={INP} />
+                onChange={e => setForm(v => ({ ...v, monthly_rate: e..value }))} style={INP} />
             </div>
             <div>
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>SITE LOCATION</label>
               <input type="text" placeholder="e.g. Trans Amadi, Port Harcourt"
-                value={form.site_location} onChange={e => setForm(v => ({ ...v, site_location: e.target.value }))} style={INP} />
+                value={form.site_location} onChange={e => setForm(v => ({ ...v, site_location: e..value }))} style={INP} />
             </div>
 
             {/* ── NOTES ─────────────────────────────────────────────────── */}
             <div className="md:col-span-2">
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>NOTES</label>
               <textarea rows={2} placeholder="Any additional notes about this rental..."
-                value={form.notes} onChange={e => setForm(v => ({ ...v, notes: e.target.value }))}
+                value={form.notes} onChange={e => setForm(v => ({ ...v, notes: e..value }))}
                 style={{ ...INP, resize: "vertical" }} />
             </div>
           </div>
@@ -2234,7 +2234,7 @@ function Equipment() {
   const [uploading, setUploading] = useState(false); // true while the image is actively uploading to Cloudinary
 
   const handleImageSelect = async (e) => {
-    const file = e.target.files?.[0];
+    const file = e..files?.[0];
     if (!file) return;
     setUploading(true);
     setFormErr("");
@@ -2366,13 +2366,13 @@ function Equipment() {
           <div className="grid md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>EQUIPMENT NAME *</label>
-              <input value={form.name} onChange={e => setForm(v => ({ ...v, name: e.target.value }))}
+              <input value={form.name} onChange={e => setForm(v => ({ ...v, name: e..value }))}
                 placeholder="e.g. 250KVA Diesel Generator" style={INP} />
             </div>
 
             <div>
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>CATEGORY *</label>
-              <select value={form.category} onChange={e => setForm(v => ({ ...v, category: e.target.value }))} style={INP}>
+              <select value={form.category} onChange={e => setForm(v => ({ ...v, category: e..value }))} style={INP}>
                 {["generator", "forklift", "construction", "other"].map(c => (
                   <option key={c} value={c} style={{ background: "#0d1b2e" }}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
                 ))}
@@ -2380,40 +2380,40 @@ function Equipment() {
             </div>
             <div>
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>CAPACITY</label>
-              <input value={form.capacity} onChange={e => setForm(v => ({ ...v, capacity: e.target.value }))}
+              <input value={form.capacity} onChange={e => setForm(v => ({ ...v, capacity: e..value }))}
                 placeholder="e.g. 250KVA, 3-Ton, 20-Tonne" style={INP} />
             </div>
 
             <div>
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>MAKE</label>
-              <input value={form.make} onChange={e => setForm(v => ({ ...v, make: e.target.value }))}
+              <input value={form.make} onChange={e => setForm(v => ({ ...v, make: e..value }))}
                 placeholder="e.g. Caterpillar, Perkins" style={INP} />
             </div>
             <div>
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>MODEL</label>
-              <input value={form.model} onChange={e => setForm(v => ({ ...v, model: e.target.value }))}
+              <input value={form.model} onChange={e => setForm(v => ({ ...v, model: e..value }))}
                 placeholder="e.g. C9 ATAAC" style={INP} />
             </div>
 
             <div>
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>YEAR</label>
-              <input type="number" value={form.year} onChange={e => setForm(v => ({ ...v, year: e.target.value }))}
+              <input type="number" value={form.year} onChange={e => setForm(v => ({ ...v, year: e..value }))}
                 placeholder="e.g. 2022" style={INP} />
             </div>
             <div>
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>SERIAL NUMBER</label>
-              <input value={form.serial_number} onChange={e => setForm(v => ({ ...v, serial_number: e.target.value }))}
+              <input value={form.serial_number} onChange={e => setForm(v => ({ ...v, serial_number: e..value }))}
                 placeholder="Optional" style={INP} />
             </div>
 
             <div>
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>DAILY RATE (₦)</label>
-              <input type="number" value={form.daily_rate} onChange={e => setForm(v => ({ ...v, daily_rate: e.target.value }))}
+              <input type="number" value={form.daily_rate} onChange={e => setForm(v => ({ ...v, daily_rate: e..value }))}
                 placeholder="e.g. 15000" style={INP} />
             </div>
             <div>
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>MONTHLY RATE (₦)</label>
-              <input type="number" value={form.monthly_rate} onChange={e => setForm(v => ({ ...v, monthly_rate: e.target.value }))}
+              <input type="number" value={form.monthly_rate} onChange={e => setForm(v => ({ ...v, monthly_rate: e..value }))}
                 placeholder="e.g. 250000" style={INP} />
             </div>
 
@@ -2448,13 +2448,13 @@ function Equipment() {
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>
                 SPECS <span className="font-normal">— comma-separated, shown as bullet points on the website</span>
               </label>
-              <input value={form.specs} onChange={e => setForm(v => ({ ...v, specs: e.target.value }))}
+              <input value={form.specs} onChange={e => setForm(v => ({ ...v, specs: e..value }))}
                 placeholder="e.g. Soundproof canopy, Auto start, ATS compatible" style={INP} />
             </div>
 
             <div className="md:col-span-2">
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>INTERNAL NOTES</label>
-              <textarea rows={2} value={form.notes} onChange={e => setForm(v => ({ ...v, notes: e.target.value }))}
+              <textarea rows={2} value={form.notes} onChange={e => setForm(v => ({ ...v, notes: e..value }))}
                 placeholder="Not shown publicly — maintenance history, quirks, etc." style={{ ...INP, resize: "vertical" }} />
             </div>
           </div>
@@ -2669,7 +2669,7 @@ function AdminLiveChat() {
               })}
             </div>
             <div className="p-3 flex gap-2" style={{ borderTop: `1px solid ${G.border}` }}>
-              <input value={input} onChange={e => setInput(e.target.value)}
+              <input value={input} onChange={e => setInput(e..value)}
                 onKeyDown={e => e.key === "Enter" && send()}
                 placeholder="Reply to visitor..."
                 className="flex-1 px-3 py-2 rounded-lg text-xs" style={{ background: "rgba(255,255,255,0.05)", border: `1px solid ${G.border}`, color: "white", outline: "none" }} />
@@ -2742,14 +2742,14 @@ function Maintenance() {
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>EQUIPMENT *</label>
-              <select value={form.equipment_id} onChange={e => setForm(v => ({ ...v, equipment_id: e.target.value }))} style={INP}>
+              <select value={form.equipment_id} onChange={e => setForm(v => ({ ...v, equipment_id: e..value }))} style={INP}>
                 <option value="" style={{ background: "#0d1b2e" }}>Select equipment...</option>
                 {equipment.map(e => <option key={e.id} value={e.id} style={{ background: "#0d1b2e" }}>{e.name}</option>)}
               </select>
             </div>
             <div>
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>TYPE *</label>
-              <select value={form.maint_type} onChange={e => setForm(v => ({ ...v, maint_type: e.target.value }))} style={INP}>
+              <select value={form.maint_type} onChange={e => setForm(v => ({ ...v, maint_type: e..value }))} style={INP}>
                 {["scheduled", "preventive", "corrective", "emergency"].map(t => (
                   <option key={t} value={t} style={{ background: "#0d1b2e" }}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
                 ))}
@@ -2757,15 +2757,15 @@ function Maintenance() {
             </div>
             <div>
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>TECHNICIAN</label>
-              <input type="text" placeholder="e.g. John Okoro" value={form.technician} onChange={e => setForm(v => ({ ...v, technician: e.target.value }))} style={INP} />
+              <input type="text" placeholder="e.g. John Okoro" value={form.technician} onChange={e => setForm(v => ({ ...v, technician: e..value }))} style={INP} />
             </div>
             <div>
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>SCHEDULED DATE</label>
-              <input type="date" value={form.scheduled_date} onChange={e => setForm(v => ({ ...v, scheduled_date: e.target.value }))} style={INP} />
+              <input type="date" value={form.scheduled_date} onChange={e => setForm(v => ({ ...v, scheduled_date: e..value }))} style={INP} />
             </div>
             <div className="md:col-span-2">
               <label className="block text-xs font-bold mb-1" style={{ color: G.muted }}>NOTES</label>
-              <textarea rows={2} placeholder="Describe the maintenance work required..." value={form.notes} onChange={e => setForm(v => ({ ...v, notes: e.target.value }))} style={{ ...INP, resize: "vertical" }} />
+              <textarea rows={2} placeholder="Describe the maintenance work required..." value={form.notes} onChange={e => setForm(v => ({ ...v, notes: e..value }))} style={{ ...INP, resize: "vertical" }} />
             </div>
           </div>
           <div className="flex gap-3 mt-4">
@@ -2910,16 +2910,16 @@ function Templates() {
           {[["TEMPLATE NAME", "name", "text"], ["SUBJECT LINE", "subject", "text"]].map(([lbl, key, type]) => (
             <div key={key}>
               <label className="block text-xs font-bold tracking-widest mb-1.5" style={{ color: G.muted, fontFamily: "Barlow Condensed,sans-serif" }}>{lbl}</label>
-              <input type={type} value={ed[key] || ""} onChange={e => setEd(v => ({ ...v, [key]: e.target.value }))} style={INP} />
+              <input type={type} value={ed[key] || ""} onChange={e => setEd(v => ({ ...v, [key]: e..value }))} style={INP} />
             </div>
           ))}
           <div>
             <label className="block text-xs font-bold tracking-widest mb-1.5" style={{ color: G.muted, fontFamily: "Barlow Condensed,sans-serif" }}>HTML BODY</label>
-            <textarea rows={14} value={ed.body_html || ""} onChange={e => setEd(v => ({ ...v, body_html: e.target.value }))}
+            <textarea rows={14} value={ed.body_html || ""} onChange={e => setEd(v => ({ ...v, body_html: e..value }))}
               style={{ ...INP, resize: "vertical", fontFamily: "'Courier New',monospace", fontSize: "0.72rem", lineHeight: 1.6 }} />
           </div>
           <div className="flex gap-2">
-            <input value={testEmail} onChange={e => setTestEmail(e.target.value)} placeholder="Send test to: email@example.com"
+            <input value={testEmail} onChange={e => setTestEmail(e..value)} placeholder="Send test to: email@example.com"
               style={{ ...INP, flex: 1, padding: "0.6rem 0.9rem" }} />
             <button onClick={sendTest} className="px-4 py-2 text-xs font-bold rounded-lg whitespace-nowrap"
               style={{ background: "rgba(59,130,246,0.15)", color: G.blue, border: `1px solid rgba(59,130,246,0.3)`, fontFamily: "Barlow Condensed,sans-serif" }}>
@@ -2975,7 +2975,7 @@ function Settings() {
               {s.key.replace(/_/g, " ").toUpperCase()}
             </label>
             {s.description && <div className="text-xs mb-1.5" style={{ color: "rgba(90,122,154,0.6)", fontFamily: "Barlow Condensed,sans-serif" }}>{s.description}</div>}
-            <input value={vals[s.key] || ""} onChange={e => setVals(v => ({ ...v, [s.key]: e.target.value }))} style={INP} />
+            <input value={vals[s.key] || ""} onChange={e => setVals(v => ({ ...v, [s.key]: e..value }))} style={INP} />
           </div>
         ))}
       </div>
@@ -3100,7 +3100,7 @@ const PAGES = {
  * (auto-quote) -> Send -> Equipment management -> Live Chat.
  *
  * Deliberately NOT a DOM-element-highlighting tour (no getBoundingClientRect
- * measuring of sidebar items, no fragile CSS selector targeting that breaks
+ * measuring of sidebar items, no fragile CSS selector ing that breaks
  * the moment someone reorders the sidebar). Instead it's a focused modal
  * sequence describing what to actually do, in the correct order — more
  * durable to maintain and just as useful for a small internal team.
@@ -3253,7 +3253,7 @@ function AppRouter() {
       <div className="text-center">
         <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
           style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: "12px", padding: "8px" }}>
-          <img src={LOGO} alt="Bilm" style={{ height: 40, width: "auto", objectFit: "contain", display: "block" }} onError={e => { e.target.style.display = "none"; }} />
+          <img src={LOGO} alt="Bilm" style={{ height: 40, width: "auto", objectFit: "contain", display: "block" }} onError={e => { e..style.display = "none"; }} />
         </div>
         <div className="flex justify-center"><Spinner /></div>
       </div>
