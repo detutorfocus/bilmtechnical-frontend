@@ -457,7 +457,20 @@ function SectionHeader({ tag, title, accent, subtitle, light = false }) {
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 function HeroSection({ setActivePage, onPortalLogin }) {
   const [counter, setCounter] = useState({ years: 0, projects: 0, fleet: 0, staff: 0 });
-  const targets = { years: 20, projects: 200, fleet: 10, staff: 15 };
+  // FIX: previously hand-typed hardcoded literals — a workaround because
+  // the Settings panel save wasn't working. Now fetched live from
+  // GET /api/settings/public. The hand-typed numbers are kept as fallback
+  // defaults (only used if a setting was never configured in the DB), so
+  // nothing regresses visually while the backend deploy is confirmed.
+  // Once Settings saving is confirmed working end-to-end, editing these
+  // in the admin panel will update the live site with no code changes.
+  const { data: publicSettings } = useApi("/settings/public");
+  const targets = {
+    years:    parseInt(publicSettings?.years_experience)   || 20,
+    projects: parseInt(publicSettings?.projects_completed) || 200,
+    fleet:    parseInt(publicSettings?.fleet_size)          || 10,
+    staff:    parseInt(publicSettings?.staff_count)         || 15,
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -476,7 +489,7 @@ function HeroSection({ setActivePage, onPortalLogin }) {
       }, 2000 / steps);
     }, 800);
     return () => clearTimeout(timer);
-  }, []);
+  }, [publicSettings]); // re-run once real settings arrive, not just on mount
 
   const stats = [
     { val: counter.years + "+", label: "Years Experience" },
@@ -974,15 +987,24 @@ function QuoteSection() {
 
 // ─── Contact Section ──────────────────────────────────────────────────────────
 function ContactSection() {
+  // FIX: phone/address were hardcoded literals disconnected from the
+  // database. Now fetched live from /settings/public — current values
+  // kept as fallback defaults only.
+  const { data: s } = useApi("/settings/public");
+  const phone   = s?.company_phone || "08037815188";
+  const email1  = s?.company_email || "admin@bilmtechnical.com";
+  const address = s?.company_address || "23 Chief Nwuke Street, Trans Amadi Industrial Layout, Port Harcourt, Rivers State";
+  const addressLines = address.split(",").map(l => l.trim()).filter(Boolean);
+
   return (
     <section className="py-24" style={{ background: "#f8fafc" }}>
       <div className="max-w-7xl mx-auto px-4">
         <SectionHeader tag="REACH US" title="CONTACT" accent="US" subtitle="Our team is ready to assist you with equipment rental, maintenance, and technical services." light />
         <div className="grid md:grid-cols-3 gap-6">
           {[
-            { icon: <Icon.Phone />, title: "CALL US", lines: ["08037815188", "+234 803 781 5188"] },
-            { icon: <Icon.Mail />, title: "EMAIL US", lines: ["admin@bilmtechnical.com", "info@bilmtechnical.com"] },
-            { icon: <Icon.MapPin />, title: "VISIT US", lines: ["23 Chief Nwuke Street", "Trans Amadi Industrial Layout", "Port Harcourt, Rivers State"] },
+            { icon: <Icon.Phone />, title: "CALL US", lines: [phone] },
+            { icon: <Icon.Mail />, title: "EMAIL US", lines: [email1, "info@bilmtechnical.com"] },
+            { icon: <Icon.MapPin />, title: "VISIT US", lines: addressLines },
           ].map(c => (
             <FadeSection key={c.title}>
               <div className="rounded-xl p-7 text-center hover:shadow-xl transition-all" style={{ background: "#0a1628", border: "1px solid rgba(34,197,94,0.15)" }}>
@@ -1002,6 +1024,14 @@ function ContactSection() {
 
 // ─── Site Footer ──────────────────────────────────────────────────────────────
 function SiteFooter({ setActivePage, onPortalLogin }) {
+  // FIX: phone/email/company_name/company_ref were hardcoded literals in
+  // the footer, disconnected from the database. Now fetched live.
+  const { data: s } = useApi("/settings/public");
+  const phone   = s?.company_phone || "08037815188";
+  const email   = s?.company_email || "admin@bilmtechnical.com";
+  const name    = s?.company_name  || "Bilm Technical Services";
+  const ref     = s?.company_ref   || "BTS/IL/0069";
+
   return (
     <footer style={{ background: "#040d1a", borderTop: "1px solid rgba(34,197,94,0.15)" }}>
       <div className="max-w-7xl mx-auto px-4 py-12">
@@ -1027,8 +1057,8 @@ function SiteFooter({ setActivePage, onPortalLogin }) {
           <div>
             <div className="text-xs font-bold tracking-widest mb-4" style={{ color: "#22c55e", fontFamily: "'Barlow Condensed', sans-serif" }}>CONTACT INFO</div>
             <div className="space-y-2 text-sm" style={{ color: "#8fadc8", fontFamily: "'Barlow', sans-serif" }}>
-              <div>08037815188</div>
-              <div>admin@bilmtechnical.com</div>
+              <div>{phone}</div>
+              <div>{email}</div>
               <div>Trans Amadi Industrial Layout</div>
               <div>Port Harcourt, Rivers State</div>
               <div>Nigeria</div>
@@ -1037,7 +1067,7 @@ function SiteFooter({ setActivePage, onPortalLogin }) {
         </div>
         <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
           <div className="text-xs" style={{ color: "#4a5568", fontFamily: "'Barlow', sans-serif" }}>
-            © 2026 Bilm Technical Services. All rights reserved. Ref: BTS/IL/0069
+            © {new Date().getFullYear()} {name}. All rights reserved. Ref: {ref}
           </div>
           <div className="text-xs" style={{ color: "#4a5568", fontFamily: "'Barlow', sans-serif" }}>
             Port Harcourt, Nigeria
